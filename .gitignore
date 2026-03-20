@@ -1,0 +1,29 @@
+# Environment variables - NEVER commit this
+.env
+
+# Maven build output
+target/
+
+# Eclipse IDE files
+.classpath
+.project
+.settings/
+*.launch
+
+# IntelliJ (just in case)
+.idea/
+*.iml
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Spring Boot specific
+spring-pid
