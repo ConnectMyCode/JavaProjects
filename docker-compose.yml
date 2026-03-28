@@ -1,5 +1,6 @@
 # Local Postgres for development. Start with: docker compose up -d
 # Env vars (DB_NAME, DB_USER, DB_PASSWORD) must match your .env
+
 services:
   db:
     image: postgres:16-alpine
@@ -8,6 +9,7 @@ services:
       POSTGRES_DB: support_tickets
       POSTGRES_USER: support_user
       POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
     ports:
       - "5432:5432"
     volumes:

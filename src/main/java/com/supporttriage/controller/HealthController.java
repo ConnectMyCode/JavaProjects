@@ -22,6 +22,7 @@ package com.supporttriage.controller;
 
 	    public HealthController(DataSource dataSource) {
 	        this.dataSource = dataSource;
+
 	    }
 
 	    @GetMapping("/health")

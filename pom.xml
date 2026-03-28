@@ -11,7 +11,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.supporttriage</groupId>
+    <groupId>com.supportraige</groupId>
     <artifactId>support-ticket-triage</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>support-ticket-triage</name>
