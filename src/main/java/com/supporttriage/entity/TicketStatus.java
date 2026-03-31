@@ -12,7 +12,7 @@
 package com.supporttriage.entity;
 
 /**
- * Represents the status of a ticket
+ * Represents the status of a ticket  
  */
 public enum TicketStatus {
     OPEN,

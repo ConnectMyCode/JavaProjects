@@ -38,15 +38,15 @@ public class User {
 	public Long getId() {
 		return id;
 	}
-
+	
 	public void setId(Long id) {
 		this.id = id;
 	}
-
+	
 	public String getEmail() {
 		return email;
 	}
-
+	
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -81,8 +81,8 @@ public class User {
 	 *
 	 * Fields:
 	 * - id: primary key (auto-generated)
-	 * - email: unique identifier for login
-	 * - passwordHash: securely stored BCrypt password
+	 * - email: unique identifier for login 
+	 * - passwordHash: securely stored BCrypt password 
 	 * - createdAt / updatedAt: timestamps for auditing
 	 *
 	 * Lifecycle Hooks:
