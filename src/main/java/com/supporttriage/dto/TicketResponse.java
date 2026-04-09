@@ -23,6 +23,11 @@ public class TicketResponse {
         this.status = status;
     }
 
+    //Explicit No Arguments Constructor added.
+	public TicketResponse() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public TicketStatus getStatus() {
 		return status;
 	}
@@ -43,6 +48,26 @@ public class TicketResponse {
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public void setStatus(TicketStatus status) {
+		this.status = status;
 	}
 
 

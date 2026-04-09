@@ -47,11 +47,10 @@ public class TicketService {
     }
 
     /**
+     * 
      * Get tickets for logged-in user
+     * 
      */
-   
-    
-
     public List<TicketResponse> getMyTickets() {
 
         String email = SecurityUtil.getCurrentUserEmail();
@@ -69,12 +68,13 @@ public class TicketService {
                         ticket.getStatus()
                 ))
                 .collect(Collectors.toList());
-    
-        
+        		
+        		
     }
     
     
     
+    /*Update ticket Status */
     public void updateTicketStatus(Long ticketId, TicketStatus status) {
 
         String email = SecurityUtil.getCurrentUserEmail();
@@ -92,6 +92,78 @@ public class TicketService {
 
         ticket.setStatus(status);
         ticketRepository.save(ticket);
+
+    }
+    
+    
+    
+    //Pagenation: 
+    public org.springframework.data.domain.Page<TicketResponse> getUserTickets(
+            org.springframework.data.domain.Pageable pageable,
+            List<String> statusList   
+    ) {
+
+        // 🔐 Get current user
+        String email = com.supporttriage.security.SecurityUtil.getCurrentUserEmail();
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        org.springframework.data.domain.Page<Ticket> ticketPage;
+
+        // 📌 No filter case
+        if (statusList == null || statusList.isEmpty()) {
+            ticketPage = ticketRepository.findByUser(user, pageable);
+        } else {
+            // 🔄 Convert String → Enum (IMPORTANT)
+            List<TicketStatus> statuses = statusList.stream()
+                    .map(s -> TicketStatus.valueOf(s.trim().toUpperCase()))
+                    .collect(java.util.stream.Collectors.toList());
+
+            ticketPage = ticketRepository.findByUserAndStatusIn(user, statuses, pageable);
+        }
+
+        // 📦 Convert Page<Ticket> → Page<TicketResponse>
+        return ticketPage.map(ticket -> mapToResponse(ticket));
+    }
+    
+    //Mapping method 
+    private TicketResponse mapToResponse(Ticket ticket) {
+        TicketResponse response = new TicketResponse();
+        response.setId(ticket.getId());
+        response.setTitle(ticket.getTitle());
+        response.setDescription(ticket.getDescription());
+        response.setStatus(ticket.getStatus());
+        response.setCreatedAt(ticket.getCreatedAt());
+        return response;
+    }
+    
+    
+    public void closeTicket(Long id) 
+    {
+    	//1.Get current user
+    	String email = SecurityUtil.getCurrentUserEmail();
+    	
+    	User user =  userRepository.findByEmail(email)
+    			.orElseThrow(() -> new RuntimeException("Ticket not found")); 
+    	
+    	//2. Find Ticket 
+    	Ticket ticket = ticketRepository.findById(id)
+    			.orElseThrow(() -> new RuntimeException("Ticket not Found"));
+    	
+    	//3. Ownership check (CRITICAL)
+    	if(!ticket.getUser().getId().equals(user.getId()))          
+    	{
+    		throw new RuntimeException("Ticket already Closed");
+    	}
+    	
+    	//Set status 
+    	ticket.setStatus(TicketStatus.CLOSED); 
+    	
+    	
+    	//Save
+    	ticketRepository.save(ticket);
+    	
     }
     
     

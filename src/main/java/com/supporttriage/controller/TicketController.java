@@ -7,6 +7,9 @@ import com.supporttriage.entity.Ticket;
 import com.supporttriage.service.TicketService;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.stream.Collectors;
 
 import java.util.List;
@@ -32,11 +35,21 @@ public class TicketController {
     /**
      * Get my tickets
      */
-    @GetMapping
+    /*@GetMapping
     public List<TicketResponse> getMyTickets() {
         return ticketService.getMyTickets();
-    }
+    }*/
     
+    
+    /*Get My ticket in pageable format*/
+    @GetMapping
+    public Page<TicketResponse> getMyTickets(
+    		Pageable pageable,
+    		@RequestParam(required = false) List<String> status
+    		) {
+    	return ticketService.getUserTickets(pageable, status);
+    }
+
     
     /*
      * Update my Tickets
@@ -46,4 +59,19 @@ public class TicketController {
                              @RequestBody UpdateTicketStatusRequest request) {
         ticketService.updateTicketStatus(id, request.getStatus());
     }
+    
+    
+    
+    /*Close the Ticket   
+     * 
+     * */
+    @PutMapping("/{id}/close")
+    public void closeTicket(@PathVariable Long id) 
+    {
+    	ticketService.closeTicket(id);
+    }  
+    
+    
+    
 }
+

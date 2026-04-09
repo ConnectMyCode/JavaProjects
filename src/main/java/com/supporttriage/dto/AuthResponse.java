@@ -13,6 +13,7 @@ public class AuthResponse {
 }
 
 
+
 /**
  * DTO for authentication response.
  *

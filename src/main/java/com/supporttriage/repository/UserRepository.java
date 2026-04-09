@@ -21,6 +21,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
  * Custom methods:
  * - findByEmail(): used during login to fetch user
  * - existsByEmail(): used during signup to prevent duplicate users
- *
+ *   
  * No implementation needed — Spring generates it automatically.
  */

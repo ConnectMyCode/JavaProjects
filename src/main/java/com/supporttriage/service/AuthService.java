@@ -22,7 +22,7 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public void signup(SignupRequest request) {
+    public void signup(SignupRequest request) {  
         if (request.getPassword().length() < 8) {
             throw new RuntimeException("Password must be at least 8 characters");
         }
@@ -70,5 +70,5 @@ public class AuthService {
  *
  * Important:
  * - Business logic lives here (not in controller)
- * - Password comparison uses PasswordEncoder.matches()
+ * - Password comparison uses PasswordEncoder.matches()     
  */
