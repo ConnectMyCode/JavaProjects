@@ -31,7 +31,7 @@ public class AuthController {
  *
  * Endpoints:
  *
- * POST /signup
+ * POST /signup 
  * - Registers a new user
  *
  * POST /login

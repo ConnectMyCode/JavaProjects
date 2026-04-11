@@ -46,7 +46,8 @@ public class TicketController {
     public Page<TicketResponse> getMyTickets(
     		Pageable pageable,
     		@RequestParam(required = false) List<String> status
-    		) {
+    		) 
+    {
     	return ticketService.getUserTickets(pageable, status);
     }
 

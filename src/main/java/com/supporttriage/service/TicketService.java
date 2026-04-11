@@ -77,7 +77,7 @@ public class TicketService {
     /*Update ticket Status */
     public void updateTicketStatus(Long ticketId, TicketStatus status) {
 
-        String email = SecurityUtil.getCurrentUserEmail();
+        String email = SecurityUtil.getCurrentUserEmail();   
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
