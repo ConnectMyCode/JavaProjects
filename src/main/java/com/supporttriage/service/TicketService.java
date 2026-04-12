@@ -5,6 +5,7 @@ import com.supporttriage.dto.TicketResponse;
 import com.supporttriage.entity.Ticket;
 import com.supporttriage.entity.TicketStatus;
 import com.supporttriage.entity.User;
+import com.supporttriage.exception.ResourceNotFoundException;
 import com.supporttriage.repository.TicketRepository;
 import com.supporttriage.repository.UserRepository;
 import com.supporttriage.security.SecurityUtil;
@@ -139,23 +140,28 @@ public class TicketService {
     }
     
     
-    public void closeTicket(Long id) 
+    public void closeTicket(Long id)  
     {
     	//1.Get current user
     	String email = SecurityUtil.getCurrentUserEmail();
     	
     	User user =  userRepository.findByEmail(email)
-    			.orElseThrow(() -> new RuntimeException("Ticket not found")); 
+    			.orElseThrow(() -> new ResourceNotFoundException("Ticket not found")); 
     	
     	//2. Find Ticket 
     	Ticket ticket = ticketRepository.findById(id)
-    			.orElseThrow(() -> new RuntimeException("Ticket not Found"));
+    			.orElseThrow(() -> new ResourceNotFoundException("Ticket not Found"));
     	
     	//3. Ownership check (CRITICAL)
     	if(!ticket.getUser().getId().equals(user.getId()))          
     	{
-    		throw new RuntimeException("Ticket already Closed");
+    		throw new RuntimeException("Unauthorized");
     	}
+    	// 4. Checking the current state  if CLOSED>>No Update required And Gives error "Already closed" if not closed then will close 🔥 ADD THIS CHECK
+    	if (ticket.getStatus() == TicketStatus.CLOSED) {
+    	    throw new RuntimeException("Ticket already closed");
+    	}
+
     	
     	//Set status 
     	ticket.setStatus(TicketStatus.CLOSED); 
