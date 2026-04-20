@@ -7,9 +7,18 @@ public class CreateTicketRequest {
 
     private String title;
     private String description;
+    private String priority;
     
     
     
+    
+    
+	public String getPriority() {
+		return priority;
+	}
+	public void setPriority(String priority) {
+		this.priority = priority;
+	}
 	public String getTitle() {
 		return title;
 	}

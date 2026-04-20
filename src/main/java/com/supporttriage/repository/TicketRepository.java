@@ -2,6 +2,7 @@ package com.supporttriage.repository;
 
 
 import com.supporttriage.entity.Ticket;
+import com.supporttriage.entity.TicketPriority;
 import com.supporttriage.entity.TicketStatus;
 import com.supporttriage.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,9 +20,15 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     
     Page<Ticket> findByUser(User user, Pageable pageable);
     Page<Ticket> findByUserAndStatusIn(User user, List<TicketStatus> statuses, Pageable pageable);
+    Page<Ticket> findByUserAndPriorityIn(User user, List<TicketPriority> priorities , Pageable pageable); 
     
+    Page<Ticket> findByUserAndStatusInAndPriorityIn(
+    		User user,
+    		List<TicketStatus> statuses,
+    		List<TicketPriority> priorities,
+    		Pageable pageable
+    );
     
-     
     
     
 }

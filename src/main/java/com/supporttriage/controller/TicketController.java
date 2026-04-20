@@ -46,10 +46,11 @@ public class TicketController {
     @GetMapping
     public Page<TicketResponse> getMyTickets(
     		Pageable pageable,
-    		@RequestParam(required = false) List<String> status
+    		@RequestParam(required = false) List<String> status, 
+    		@RequestParam(required = false) List<String> priority
     		) 
     {
-    	return ticketService.getUserTickets(pageable, status);
+    	return ticketService.getMyTickets(pageable, status,priority);
     }
 
     

@@ -5,6 +5,7 @@
 target/
 
 # Eclipse IDE files
+.metadata
 .classpath
 .project
 .settings/

@@ -1,8 +1,9 @@
 package com.supporttriage.service;
 
-import com.supporttriage.dto.CreateTicketRequest;
+import com.supporttriage.dto.CreateTicketRequest; 
 import com.supporttriage.dto.TicketResponse;
 import com.supporttriage.entity.Ticket;
+import com.supporttriage.entity.TicketPriority;
 import com.supporttriage.entity.TicketStatus;
 import com.supporttriage.entity.User;
 import com.supporttriage.exception.ResourceNotFoundException;
@@ -10,6 +11,9 @@ import com.supporttriage.repository.TicketRepository;
 import com.supporttriage.repository.UserRepository;
 import com.supporttriage.security.SecurityUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 import java.util.stream.Collectors;
 
@@ -28,7 +32,7 @@ public class TicketService {
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
     }
-
+    
     /**
      * Create ticket for logged-in user
      */
@@ -43,35 +47,103 @@ public class TicketService {
         ticket.setTitle(request.getTitle());
         ticket.setDescription(request.getDescription());
         ticket.setUser(user);
-
+        
+        TicketPriority priority = TicketPriority.LOW;
+        
+        if(request.getPriority() != null && !request.getPriority().isEmpty()) 
+        {
+        	try 
+        	{
+        		priority = TicketPriority.valueOf(request.getPriority().trim().toUpperCase());        		
+        	}
+        	catch(IllegalArgumentException e) 
+        	{
+        		throw new RuntimeException("Invalid priority value");
+        	}
+        }
+        
+        ticket.setPriority(priority); 
         ticketRepository.save(ticket);
     }
 
     /**
      * 
-     * Get tickets for logged-in user
+     * Get tickets for logged-in user	
      * 
      */
-    public List<TicketResponse> getMyTickets() {
+    public Page<TicketResponse> getMyTickets(
+            Pageable pageable,
+            List<String> statusParams,
+            List<String> priorityParams
+    ) {
 
         String email = SecurityUtil.getCurrentUserEmail();
 
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return ticketRepository.findByUser(user)
-                .stream()
-                .map(ticket -> new TicketResponse(
-                        ticket.getId(),
-                        ticket.getTitle(),
-                        ticket.getDescription(),
-                        ticket.getCreatedAt(),
-                        ticket.getStatus()
-                ))
-                .collect(Collectors.toList());
-        		
-        		
+        // ✅ Convert status
+        List<TicketStatus> statuses = null;
+
+        if (statusParams != null && !statusParams.isEmpty()) {
+            statuses = statusParams.stream()
+                    .map(s -> TicketStatus.valueOf(s.trim().toUpperCase()))
+                    .collect(Collectors.toList());
+        }
+
+        // ✅ Convert priority (YOUR STEP 4)
+        List<TicketPriority> priorities = null;
+
+        if (priorityParams != null && !priorityParams.isEmpty()) {
+            priorities = priorityParams.stream()
+                    .map(p -> {
+                        try {
+                            return TicketPriority.valueOf(p.trim().toUpperCase());
+                        } catch (IllegalArgumentException e) {
+                            throw new RuntimeException("Invalid priority value");
+                        }
+                    })
+                    .collect(Collectors.toList());
+        }
+
+        Page<Ticket> ticketPage;
+
+        // ✅ Case 1: No filters
+        if (statuses == null && priorities == null) {
+            ticketPage = ticketRepository.findByUser(user, pageable);
+        }
+
+        // ✅ Case 2: Only status
+        else if (statuses != null && priorities == null) {
+            ticketPage = ticketRepository.findByUserAndStatusIn(user, statuses, pageable);
+        }
+
+        // ✅ Case 3: Only priority
+        else if (statuses == null) {
+            ticketPage = ticketRepository.findByUserAndPriorityIn(user, priorities, pageable);
+        }
+
+        // ✅ Case 4: Both filters
+        else {
+            ticketPage = ticketRepository.findByUserAndStatusInAndPriorityIn(
+                    user, statuses, priorities, pageable);
+        }
+
+        return ticketPage.map(ticket -> mapToResponse(ticket));
+        
     }
+    
+    private TicketResponse mapToResponse(Ticket ticket) {
+        TicketResponse response = new TicketResponse();
+        response.setId(ticket.getId());
+        response.setTitle(ticket.getTitle());
+        response.setDescription(ticket.getDescription());
+        response.setStatus(ticket.getStatus());
+        response.setCreatedAt(ticket.getCreatedAt());
+        response.setPriority(ticket.getPriority());
+        return response;
+    }
+    
     
     
     
@@ -97,49 +169,8 @@ public class TicketService {
     }
     
     
-    
-    //Pagenation: 
-    public org.springframework.data.domain.Page<TicketResponse> getUserTickets(
-            org.springframework.data.domain.Pageable pageable,
-            List<String> statusList   
-    ) {
-
-        // 🔐 Get current user
-        String email = com.supporttriage.security.SecurityUtil.getCurrentUserEmail();
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        org.springframework.data.domain.Page<Ticket> ticketPage;
-
-        // 📌 No filter case
-        if (statusList == null || statusList.isEmpty()) {
-            ticketPage = ticketRepository.findByUser(user, pageable);
-        } else {
-            // 🔄 Convert String → Enum (IMPORTANT)
-            List<TicketStatus> statuses = statusList.stream()
-                    .map(s -> TicketStatus.valueOf(s.trim().toUpperCase()))
-                    .collect(java.util.stream.Collectors.toList());
-
-            ticketPage = ticketRepository.findByUserAndStatusIn(user, statuses, pageable);
-        }
-
-        // 📦 Convert Page<Ticket> → Page<TicketResponse>
-        return ticketPage.map(ticket -> mapToResponse(ticket));
-    }
-    
-    //Mapping method 
-    private TicketResponse mapToResponse(Ticket ticket) {
-        TicketResponse response = new TicketResponse();
-        response.setId(ticket.getId());
-        response.setTitle(ticket.getTitle());
-        response.setDescription(ticket.getDescription());
-        response.setStatus(ticket.getStatus());
-        response.setCreatedAt(ticket.getCreatedAt());
-        return response;
-    }
-    
-    
+  
+   
     public void closeTicket(Long id)  
     {
     	//1.Get current user
@@ -176,4 +207,3 @@ public class TicketService {
     
     
 }
-

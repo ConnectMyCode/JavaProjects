@@ -34,7 +34,12 @@ public class Ticket {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private TicketStatus status = TicketStatus.OPEN;
-
+    
+    
+    @Enumerated(EnumType.STRING)
+    @Column(nullable =false)
+    private TicketPriority priority = TicketPriority.LOW;
+    
     /**
      * Link ticket to the user who created it
      */
@@ -105,4 +110,15 @@ public class Ticket {
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
     }
+
+	public TicketPriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(TicketPriority priority) {
+		this.priority = priority;
+	}
+    
+    
+    
 }

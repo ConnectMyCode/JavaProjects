@@ -1,7 +1,8 @@
-package com.supporttriage.dto;
+	package com.supporttriage.dto;
 
 import java.time.LocalDateTime;
 
+import com.supporttriage.entity.TicketPriority;
 import com.supporttriage.entity.TicketStatus;
 
 /**
@@ -14,13 +15,17 @@ public class TicketResponse {
     private String description;
     private LocalDateTime createdAt;
     private TicketStatus status;
+    private TicketPriority priority;
+    
 
-    public TicketResponse(Long id, String title, String description, LocalDateTime createdAt, TicketStatus status) {
+    public TicketResponse(Long id, String title, String description, LocalDateTime createdAt, TicketStatus status, TicketPriority priority) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.status = status;
+        this.priority = priority;
+        
     }
 
     //Explicit No Arguments Constructor added.
@@ -56,6 +61,15 @@ public class TicketResponse {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	/*Priority*/
+	public TicketPriority getPriority() {
+		return priority;
+	}
+
+	public void setPriority(TicketPriority priority) {
+		this.priority = priority;
 	}
 
 	public void setDescription(String description) {
