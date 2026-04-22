@@ -40,6 +40,19 @@ public class Ticket {
     @Column(nullable =false)
     private TicketPriority priority = TicketPriority.LOW;
     
+   // Category (AI will fill later)
+    @Column(name = "category")
+    private String category;
+    
+    
+ // Sentiment (AI will fill later)
+   @Column(name="sentiment")
+    private String sentiment;
+    
+ //👉 Keep them as String (DO NOT create enums now — AI phase will decide structure)
+    
+    
+    
     /**
      * Link ticket to the user who created it
      */
@@ -48,19 +61,43 @@ public class Ticket {
     private User user;
 
     /**
-     * Timestamp when ticket is created
+     * TimeStamp when ticket is created			
      */
-    @Column(name = "created_at", nullable = false)
+    
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+    
+    @Column(name = "responded_at")
+    private LocalDateTime respondedAt;
+    
+    @Column(name = "triaged_at")
+    private LocalDateTime triagedAt;
+        
+    @Column(name = "closed_at")
+    private LocalDateTime closedAt;
+    
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
-
+   
     /**
      * Automatically sets createdAt before inserting into DB
+     * LifeCycle Hook
      */
+    
+    @PreUpdate
+    public void onUpdate() 
+    {
+    	this.updatedAt = LocalDateTime.now();
+    }
+    
     @PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
     }
+    
+    
 
+    
     // ===== Getters and Setters =====
 
     public Long getId() {
@@ -99,7 +136,31 @@ public class Ticket {
         return user;
     }
 
-    public void setUser(User user) {
+    public LocalDateTime getRespondedAt() {
+		return respondedAt;
+	}
+
+	public void setRespondedAt(LocalDateTime respondedAt) {
+		this.respondedAt = respondedAt;
+	}
+
+	public LocalDateTime getTriagedAt() {
+		return triagedAt;
+	}
+
+	public void setTriagedAt(LocalDateTime triagedAt) {
+		this.triagedAt = triagedAt;
+	}
+
+	public LocalDateTime getClosedAt() {
+		return closedAt;
+	}
+
+	public void setClosedAt(LocalDateTime closedAt) {
+		this.closedAt = closedAt;
+	}
+
+	public void setUser(User user) {
         this.user = user;
     }
 
@@ -118,7 +179,4 @@ public class Ticket {
 	public void setPriority(TicketPriority priority) {
 		this.priority = priority;
 	}
-    
-    
-    
 }

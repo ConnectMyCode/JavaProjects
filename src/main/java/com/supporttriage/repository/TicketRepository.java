@@ -30,5 +30,15 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     );
     
     
+    //Get tickets for Admin
+    Page<Ticket> findByStatusIn(List<TicketStatus> statuses, Pageable pageable);
+
+    Page<Ticket> findByPriorityIn(List<TicketPriority> priorities, Pageable pageable);
+
+    Page<Ticket> findByStatusInAndPriorityIn(
+            List<TicketStatus> statuses,
+            List<TicketPriority> priorities,
+            Pageable pageable
+    );
     
 }

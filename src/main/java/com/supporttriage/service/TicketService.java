@@ -1,5 +1,7 @@
 package com.supporttriage.service;
 
+import com.supporttriage.repository.TicketRepository;
+
 import com.supporttriage.dto.CreateTicketRequest; 
 import com.supporttriage.dto.TicketResponse;
 import com.supporttriage.entity.Ticket;
@@ -16,9 +18,7 @@ import org.springframework.data.domain.Pageable;
 
 
 import java.util.stream.Collectors;
-
-
-
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -146,6 +146,59 @@ public class TicketService {
     
     
     
+    /*
+     * 
+     * Get tickets for admin only
+     * 
+     * */
+    
+    public Page<TicketResponse> getAllTicketsForAdmin(
+            Pageable pageable,
+            List<String> status,
+            List<String> priority
+    ) {
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        if (!email.equals("admin@example.com")) {
+            throw new RuntimeException("Unauthorized");
+        }
+
+        List<TicketStatus> statusList = null;
+        List<TicketPriority> priorityList = null;
+
+        try {
+            if (status != null && !status.isEmpty()) {
+                statusList = status.stream()
+                        .map(s -> TicketStatus.valueOf(s.trim().toUpperCase()))
+                        .collect(Collectors.toList());
+            }
+
+            if (priority != null && !priority.isEmpty()) {
+                priorityList = priority.stream()
+                        .map(p -> TicketPriority.valueOf(p.trim().toUpperCase()))
+                        .collect(Collectors.toList());
+            }
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status or priority value");
+        }
+
+        Page<Ticket> ticketPage;
+
+        if (statusList != null && priorityList != null) {
+            ticketPage = ticketRepository.findByStatusInAndPriorityIn(statusList, priorityList, pageable);
+        } else if (statusList != null) {
+            ticketPage = ticketRepository.findByStatusIn(statusList, pageable);
+        } else if (priorityList != null) {
+            ticketPage = ticketRepository.findByPriorityIn(priorityList, pageable);
+        } else {
+            ticketPage = ticketRepository.findAll(pageable); // from JpaRepository
+        }
+
+        return ticketPage.map(this::mapToResponse);
+    }
+    
+    
+    
     
     /*Update ticket Status */
     public void updateTicketStatus(Long ticketId, TicketStatus status) {
@@ -162,22 +215,26 @@ public class TicketService {
         if (!ticket.getUser().getId().equals(user.getId())) {
             throw new RuntimeException("Unauthorized");
         }
-
+        
+        
+        if (ticket.getStatus() == TicketStatus.CLOSED) {
+    	    throw new RuntimeException("Ticket already closed");
+    	}
+        
         ticket.setStatus(status);
         ticketRepository.save(ticket);
 
     }
     
     
-  
-   
+    
     public void closeTicket(Long id)  
     {
     	//1.Get current user
     	String email = SecurityUtil.getCurrentUserEmail();
     	
     	User user =  userRepository.findByEmail(email)
-    			.orElseThrow(() -> new ResourceNotFoundException("Ticket not found")); 
+    			.orElseThrow(() -> new ResourceNotFoundException("User not found")); 
     	
     	//2. Find Ticket 
     	Ticket ticket = ticketRepository.findById(id)
@@ -194,6 +251,8 @@ public class TicketService {
     	}
 
     	
+    	ticket.setClosedAt(LocalDateTime.now());
+    	
     	//Set status 
     	ticket.setStatus(TicketStatus.CLOSED); 
     	
@@ -202,8 +261,5 @@ public class TicketService {
     	ticketRepository.save(ticket);
     	
     }
-    
-    
-    
     
 }

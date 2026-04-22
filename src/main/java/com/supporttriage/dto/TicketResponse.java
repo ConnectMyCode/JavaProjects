@@ -16,7 +16,7 @@ public class TicketResponse {
     private LocalDateTime createdAt;
     private TicketStatus status;
     private TicketPriority priority;
-    
+
 
     public TicketResponse(Long id, String title, String description, LocalDateTime createdAt, TicketStatus status, TicketPriority priority) {
         this.id = id;
