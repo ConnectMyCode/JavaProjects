@@ -2,8 +2,10 @@ package com.supporttriage.service;
 
 import com.supporttriage.repository.TicketRepository;
 
-import com.supporttriage.dto.CreateTicketRequest; 
+import com.supporttriage.dto.CreateTicketRequest;
+import com.supporttriage.dto.RespondTicketRequest;
 import com.supporttriage.dto.TicketResponse;
+import com.supporttriage.dto.TriageSaveRequest;
 import com.supporttriage.entity.Ticket;
 import com.supporttriage.entity.TicketPriority;
 import com.supporttriage.entity.TicketStatus;
@@ -249,7 +251,7 @@ public class TicketService {
     	if (ticket.getStatus() == TicketStatus.CLOSED) {
     	    throw new RuntimeException("Ticket already closed");
     	}
-
+ 
     	
     	ticket.setClosedAt(LocalDateTime.now());
     	
@@ -261,5 +263,95 @@ public class TicketService {
     	ticketRepository.save(ticket);
     	
     }
+    
+    
+    
+    public void respondToTicket(Long id ,RespondTicketRequest request) 
+    {
+    	
+    	//Get logged-in user	
+    	String email = SecurityUtil.getCurrentUserEmail();   
+    	
+    	User user = userRepository.findByEmail(email)
+    			.orElseThrow(() -> new RuntimeException("User Not Found"));   
+
+    	
+    	
+    	//2.Find ticket
+    	Ticket ticket = ticketRepository.findById(id)
+    			.orElseThrow(() -> new RuntimeException("Ticket not found") );
+    	
+    	
+    	//3.OwnerShip check
+    	if(!ticket.getUser().getId().equals(user.getId())) 
+    	{
+    		throw new RuntimeException("Unauthorized");
+    	}
+    	
+    	
+    	   //4.Transition rule -> only TRIAGED tickets can be responded to
+        if(ticket.getStatus() == TicketStatus.CLOSED) 
+        {
+        	
+        		throw new RuntimeException("Ticket already closed");        		
+        }
+        
+
+        //5. Save Response details
+        ticket.setFinalResponse(request.getFinalResponse());
+        ticket.setResolutionNote(request.getResolutionNote());
+        
+        
+        //6. Update workflow
+    	ticket.setRespondedAt(LocalDateTime.now());
+    	ticket.setStatus(TicketStatus.IN_PROGRESS);
+    	
+    	
+    	//7.Save
+    	ticketRepository.save(ticket); 
+    }
+    
+    
+    public void triageSave(Long id , TriageSaveRequest request ) 
+    {
+    	
+    	
+    	//Get Logged-in user	
+        String email = SecurityUtil.getCurrentUserEmail();
+
+        
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        
+        //2.Find ticket
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ticket not found"));
+        
+        
+        //3.OwnerShip check
+        if (!ticket.getUser().getId().equals(user.getId())) {
+            throw new RuntimeException("Unauthorized");
+        }
+        
+        
+        if(ticket.getFinalResponse() != null ) 
+        {
+        	throw new RuntimeException("Final Response already given");
+        }
+        
+        if(ticket.getResolutionNote() != null) 
+        {
+        	throw new RuntimeException("Resolution note already entered");
+        }
+        
+        
+        ticket.setCategory(request.getCategory());
+        ticket.setSentiment(request.getSentiment());
+        ticket.setTriagedAt(LocalDateTime.now());
+
+        ticketRepository.save(ticket);
+    }
+    
     
 }

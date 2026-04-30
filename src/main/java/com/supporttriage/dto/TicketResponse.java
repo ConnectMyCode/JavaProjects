@@ -16,19 +16,40 @@ public class TicketResponse {
     private LocalDateTime createdAt;
     private TicketStatus status;
     private TicketPriority priority;
+    private String finalResponse;
+    private String resolutionNote;
 
 
-    public TicketResponse(Long id, String title, String description, LocalDateTime createdAt, TicketStatus status, TicketPriority priority) {
+    public TicketResponse(Long id, String title, String description, LocalDateTime createdAt, TicketStatus status, TicketPriority priority, String finalresponse, String resolutionNote) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.createdAt = createdAt;
         this.status = status;
         this.priority = priority;
+        this.finalResponse = finalResponse;
+        this.resolutionNote = resolutionNote;
+        
         
     }
 
-    //Explicit No Arguments Constructor added.
+    public String getFinalResponse() {
+		return finalResponse;
+	}
+
+	public void setFinalResponse(String finalResponse) {
+		this.finalResponse = finalResponse;
+	}
+
+	public String getResolutionNote() {
+		return resolutionNote;
+	}
+
+	public void setResolutionNote(String resolutionNote) {
+		this.resolutionNote = resolutionNote;
+	}
+
+	//Explicit No Arguments Constructor added.
 	public TicketResponse() {
 		// TODO Auto-generated constructor stub
 	}

@@ -1,8 +1,9 @@
 package com.supporttriage.controller;
 
 import com.supporttriage.dto.CreateTicketRequest;
-
+import com.supporttriage.dto.RespondTicketRequest;
 import com.supporttriage.dto.TicketResponse;
+import com.supporttriage.dto.TriageSaveRequest;
 import com.supporttriage.dto.UpdateTicketStatusRequest;
 import com.supporttriage.entity.Ticket;
 import com.supporttriage.service.TicketService;
@@ -73,6 +74,24 @@ public class TicketController {
     {
     	ticketService.closeTicket(id);
     }  
+    
+    
+    /* Save mY tICKET  */
+    @PostMapping("/{id}/triage/save")
+    public void triageSave(@PathVariable Long id, 
+    					   @RequestBody TriageSaveRequest request) 
+    {
+    	ticketService.triageSave(id , request);
+    }
+    
+    
+    /*Respond to ticket*/
+    @PostMapping("/{id}/respond")
+    public void respondToTicket(@PathVariable Long id,
+    							@RequestBody RespondTicketRequest request) 
+    {
+    	ticketService.respondToTicket(id,request);
+    }
     
     
     

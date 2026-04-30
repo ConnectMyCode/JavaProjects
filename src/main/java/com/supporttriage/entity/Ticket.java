@@ -79,10 +79,19 @@ public class Ticket {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
    
+    @Column(name = "final_response")
+    private String finalResponse;
+    
+    @Column(name = "resolution_note")
+    private String resolutionNote;
+    
     /**
      * Automatically sets createdAt before inserting into DB
      * LifeCycle Hook
      */
+   
+    
+    
     
     @PreUpdate
     public void onUpdate() 
@@ -90,7 +99,23 @@ public class Ticket {
     	this.updatedAt = LocalDateTime.now();
     }
     
-    @PrePersist
+    public String getFinalResponse() {
+		return finalResponse;
+	}
+
+	public void setFinalResponse(String finalResponse) {
+		this.finalResponse = finalResponse;
+	}
+
+	public String getResolutionNote() {
+		return resolutionNote;
+	}
+
+	public void setResolutionNote(String resolutionNote) {
+		this.resolutionNote = resolutionNote;
+	}
+
+	@PrePersist
     public void onCreate() {
         createdAt = LocalDateTime.now();
     }
@@ -164,7 +189,23 @@ public class Ticket {
         this.user = user;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCategory() {
+		return category;
+	}
+
+	public void setCategory(String category) {
+		this.category = category;
+	}
+
+	public String getSentiment() {
+		return sentiment;
+	}
+
+	public void setSentiment(String sentiment) {
+		this.sentiment = sentiment;
+	}
+
+	public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
