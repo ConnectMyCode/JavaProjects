@@ -223,6 +223,11 @@ public class TicketService {
     	    throw new RuntimeException("Ticket already closed");
     	}
         
+        if(ticket.getStatus() == TicketStatus.OPEN){
+        	throw new RuntimeException("Ticket already Opened");
+        }
+        
+        
         ticket.setStatus(status);
         ticketRepository.save(ticket);
 
@@ -265,6 +270,10 @@ public class TicketService {
     }
     
     
+    
+    /*
+     * Responding Ticket
+     * */
     
     public void respondToTicket(Long id ,RespondTicketRequest request) 
     {
@@ -335,16 +344,7 @@ public class TicketService {
         }
         
         
-        if(ticket.getFinalResponse() != null ) 
-        {
-        	throw new RuntimeException("Final Response already given");
-        }
-        
-        if(ticket.getResolutionNote() != null) 
-        {
-        	throw new RuntimeException("Resolution note already entered");
-        }
-        
+  
         
         ticket.setCategory(request.getCategory());
         ticket.setSentiment(request.getSentiment());
