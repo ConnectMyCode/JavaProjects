@@ -38,8 +38,8 @@ public class TicketService {
     /**
      * Create ticket for logged-in user
      */
-    public void createTicket(CreateTicketRequest request) {
-
+    public void createTicket(CreateTicketRequest request) { 
+    	
         String email = SecurityUtil.getCurrentUserEmail();
 
         User user = userRepository.findByEmail(email)
@@ -62,6 +62,13 @@ public class TicketService {
         	{
         		throw new RuntimeException("Invalid priority value");
         	}
+        }
+        
+        
+        
+        if(request.getTitle() == null || request.getTitle().trim().isEmpty() || request.getDescription() == null  || request.getDescription().trim().isEmpty()) 
+        {
+        	throw new RuntimeException("Description or Title not provided : required fields");    
         }
         
         ticket.setPriority(priority); 
@@ -223,11 +230,7 @@ public class TicketService {
     	    throw new RuntimeException("Ticket already closed");
     	}
         
-        if(ticket.getStatus() == TicketStatus.OPEN){
-        	throw new RuntimeException("Ticket already Opened");
-        }
-        
-        
+
         ticket.setStatus(status);
         ticketRepository.save(ticket);
 
@@ -246,7 +249,7 @@ public class TicketService {
     	//2. Find Ticket 
     	Ticket ticket = ticketRepository.findById(id)
     			.orElseThrow(() -> new ResourceNotFoundException("Ticket not Found"));
-    	
+    					
     	//3. Ownership check (CRITICAL)
     	if(!ticket.getUser().getId().equals(user.getId()))          
     	{
@@ -301,10 +304,14 @@ public class TicketService {
     	   //4.Transition rule -> only TRIAGED tickets can be responded to
         if(ticket.getStatus() == TicketStatus.CLOSED) 
         {
-        	
         		throw new RuntimeException("Ticket already closed");        		
         }
         
+        //Added empty-string guard for safer production behavior. If user i/p: " "   then it can break the Production.So added this condition make it more production safer. 
+        if(request.getResolutionNote() == null || request.getResolutionNote().trim().isEmpty() || request.getFinalResponse() == null || request.getFinalResponse().trim().isEmpty())   
+        {
+        	throw new RuntimeException("Ticket must be TRIAGED before Responding");
+        }
 
         //5. Save Response details
         ticket.setFinalResponse(request.getFinalResponse());
@@ -327,31 +334,40 @@ public class TicketService {
     	
     	//Get Logged-in user	
         String email = SecurityUtil.getCurrentUserEmail();
-
+        
         
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        
         
         //2.Find ticket
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ticket not found"));
         
-        
         //3.OwnerShip check
         if (!ticket.getUser().getId().equals(user.getId())) {
-            throw new RuntimeException("Unauthorized");
+        	throw new RuntimeException("Unauthorized");
         }
         
+         
+        if(ticket.getStatus() == TicketStatus.CLOSED)
+        {
+        	throw new RuntimeException("Invalid ticket status for triage");
+        }	
         
-  
+        
+        if(request.getCategory() == null || request.getCategory().trim().isEmpty() || request.getSentiment() == null || request.getSentiment().trim().isEmpty() ) 
+        {
+        	throw new RuntimeException("Categor and Sentiment field required.");
+        }
+        
         
         ticket.setCategory(request.getCategory());
         ticket.setSentiment(request.getSentiment());
         ticket.setTriagedAt(LocalDateTime.now());
-
+        
         ticketRepository.save(ticket);
-    }
-    
-    
+    }  	
+        	
+    	
 }
