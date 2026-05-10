@@ -360,8 +360,8 @@ public class TicketService {
         {
         	throw new RuntimeException("Categor and Sentiment field required.");
         }
-        
-        
+        												
+        												
         ticket.setCategory(request.getCategory());
         ticket.setSentiment(request.getSentiment());
         ticket.setTriagedAt(LocalDateTime.now());

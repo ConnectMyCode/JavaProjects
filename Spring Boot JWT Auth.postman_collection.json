@@ -1,0 +1,789 @@
+{
+  "info": {
+    "_postman_id": "bbf61856-ef98-463f-aac4-3281012a0542",
+    "name": "Spring Boot JWT Auth",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53567780",
+    "_collection_link": "https://go.postman.co/collection/53567780-bbf61856-ef98-463f-aac4-3281012a0542?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "User Signup",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"test@example.com\",\r\n  \"password\": \"password123\"\r\n}\r\n\r\n\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/signup",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "signup"
+          ]
+        },
+        "description": "## Signup\n\nRegisters a new user account in the system.\n\n**Endpoint:** `POST /api/auth/signup`\n\n**Base URL:** `http://localhost:8080`\n\n---\n\n### Request Body\n\nSend a JSON object with the following fields:\n\n| Field      | Type   | Required | Description                        |\n|------------|--------|----------|------------------------------------|\n| `email`    | string | Yes      | The email address of the new user. |\n| `password` | string | Yes      | The password for the new account.  |\n\n**Example:**\n```json\n{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}\n```\n\n---\n\n### Responses\n\n| Status Code | Description                                      |\n|-------------|--------------------------------------------------|\n| `200 OK`    | User registered successfully.                    |\n| `400 Bad Request` | Invalid input or email already in use.     |\n| `500 Internal Server Error` | Unexpected server error.         |\n\n---\n\n### Notes\n\n- Passwords should be sufficiently strong for security purposes.\n- Once registered, use the **Login** endpoint to obtain a JWT token for authenticated requests."
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Signup",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{ \"email\": \"admin@example.com\",\r\n  \"password\": \"adminpassword\"\r\n}\r\n\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/signup",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "signup"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin and User Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.collectionVariables.set(\"token\", pm.response.json().token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "/*{\r\n  \"email\": \"User2@example.com\",\r\n  \"password\": \"passwordUser2\"\r\n}   */\r\n\r\n\r\n{\r\n  \"email\": \"test@example.com\",\r\n  \"password\": \"password123\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        },
+        "description": "## Login\n\nAuthenticates an existing user and returns a JWT token for use in subsequent authorized requests.\n\n**Endpoint:** `POST /api/auth/login`\n\n**Base URL:** `http://localhost:8080`\n\n---\n\n### Request Body\n\nSend a JSON object with the following fields:\n\n| Field | Type | Required | Description |\n|-------|------|----------|-------------|\n| `email` | string | Yes | The registered email address of the user |\n| `password` | string | Yes | The user's password |\n\n**Example:**\n```json\n{\n  \"email\": \"test@example.com\",\n  \"password\": \"password123\"\n}\n```\n\n---\n\n### Response\n\n**Success (200 OK)**\n\nReturns a JWT token to be used as a Bearer token in the `Authorization` header for protected endpoints.\n\n```json\n{\n  \"token\": \"<jwt_token>\"\n}\n```\n\n| Field | Type | Description |\n|-------|------|-------------|\n| `token` | string | Signed JWT token (HS384) used to authenticate future requests |\n\n---\n\n### Post-Response Script\n\nAfter a successful login, the response token is automatically saved to the collection variable `token`:\n\n```js\npm.collectionVariables.set(\"token\", pm.response.json().token);\n```\n\nThis allows other requests in the collection to reference `{{token}}` in their `Authorization` header.\n\n---\n\n### Notes\n\n- The token is signed using the **HS384** algorithm.\n- Use the token as a Bearer token: `Authorization: Bearer {{token}}`.\n- Ensure you have first created an account using the **Signup** endpoint before attempting to log in."
+      },
+      "response": []
+    },
+    {
+      "name": "TestJwtToken",
+      "protocolProfileBehavior": {
+        "disableBodyPruning": true
+      },
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/test",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "test"
+          ]
+        },
+        "description": "## TestJwtToken\n\nThis request tests whether a JWT token is valid by making an authenticated GET request to a protected endpoint. If the token is valid, the server responds with information about the currently logged-in user (e.g., `\"Logged in as: test@example.com\"`).\n\n---\n\n### Authentication\n\nThis request uses **Bearer Token** authentication. The token is passed via the `Authorization` header:\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\nThe `{{token}}` variable must be set in the active environment. It is automatically populated after a successful login via the **Login** request.\n\n---\n\n### Prerequisites\n\n- You must have completed a successful login using the **Login** request.\n    \n- The `{{token}}` environment variable must be set and contain a valid JWT token.\n    \n\n---\n\n### Expected Response\n\n**Status:** `200 OK`\n\n**Body (example):**\n\n```\nLogged in as: test@example.com\n\n ```\n\nIf the token is missing, expired, or invalid, the server will return a `401 Unauthorized` or `403 Forbidden` response."
+      },
+      "response": []
+    },
+    {
+      "name": "Create_Ticket With Priority",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Cannot upload photo\",\r\n  \"description\": \"Uploading photo is displaying an error cannot uplaod.\",\r\n  \"priority\": \"MEDIUM\"\r\n\r\n}\r\n\r\n\r\n\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ]
+        },
+        "description": "## Create Ticket\n\nCreates a new support ticket in the system.\n\n**Endpoint:** `POST /api/tickets`\n\n**Base URL:** `http://localhost:8080`\n\n---\n\n### Authentication\n\nThis endpoint requires a valid JWT token. Include it in the `Authorization` header using the Bearer scheme:\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\nThe `{{token}}` variable should be set in your active environment after a successful [Login](http://localhost:8080/api/auth/login) request.\n\n---\n\n### Request Body\n\nSend a JSON object with the following fields:\n\n| Field | Type | Required | Description |\n| --- | --- | --- | --- |\n| `title` | string | Yes | A short summary of the issue |\n| `description` | string | Yes | A detailed description of the problem |\n\n**Example:**\n\n``` json\n{\n  \"title\": \"Login In Button Issue\",\n  \"description\": \"Cannot click Login Button of the system\"\n}\n\n ```\n\n---\n\n### Response\n\nOn success, the server returns the created ticket object with an HTTP `201 Created` status.\n\n---\n\n### Notes\n\n- Ensure the `token` environment variable is populated before sending this request.\n    \n- The ticket will be associated with the authenticated user's account."
+      },
+      "response": []
+    },
+    {
+      "name": "Create Ticket Without Priority",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Bug\",\r\n  \"description\": \"Something broke\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Admin Get My Tickets",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/admin/tickets?page=1&size=5",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "admin",
+            "tickets"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "size",
+              "value": "5"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "User Get My Tickets",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Triage Save Feature",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"category\": \"General-software Glitch\",\r\n  \"sentiment\": \"Neutral\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/33/triage/save",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "33",
+            "triage",
+            "save"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Respond Feature Test",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"finalResponse\": \"On going\",\r\n  \"resolutionNote\": \"On going\"\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/33/respond",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "33",
+            "respond"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Close_Ticket",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/33/close",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "33",
+            "close"
+          ]
+        },
+        "description": "## Close Ticket\n\nCloses an existing support ticket by its ID, marking it as resolved.\n\n**Endpoint:** `PUT /api/tickets/{id}/close`\n\n**Base URL:** `http://localhost:8080`\n\n---\n\n### Authentication\n\nThis endpoint requires a valid JWT token passed as a Bearer token in the `Authorization` header.\n\n| Header | Value |\n|---|---|\n| `Authorization` | `Bearer {{token}}` |\n\nMake sure the `token` variable is set in your active environment before sending this request.\n\n---\n\n### Path Parameters\n\n| Parameter | Type | Required | Description |\n|---|---|---|---|\n| `id` | integer | Yes | The unique ID of the ticket to close. |\n\nIn the current example, ticket ID `4` is used: `/api/tickets/4/close`.\n\n---\n\n### Request Body\n\nThis endpoint does not require a request body.\n\n---\n\n### Response\n\n**Success — `200 OK`**\n\nReturns the updated ticket object with its status set to `CLOSED`.\n\n```json\n{\n  \"id\": 4,\n  \"title\": \"Sample Ticket\",\n  \"description\": \"Issue description here\",\n  \"status\": \"CLOSED\",\n  \"createdAt\": \"2024-01-01T10:00:00\"\n}\n```\n\n**Error Responses**\n\n| Status Code | Meaning |\n|---|---|\n| `401 Unauthorized` | Missing or invalid JWT token. |\n| `403 Forbidden` | The authenticated user does not have permission to close this ticket. |\n| `404 Not Found` | No ticket exists with the given ID. |\n\n---\n\n### Notes\n\n- Only the ticket owner or an admin may close a ticket.\n- Once closed, a ticket's status cannot be changed back without an explicit update via the Update Ticket endpoint.\n- Ensure the `token` environment variable holds a valid, non-expired JWT obtained from the Login request."
+      },
+      "response": []
+    },
+    {
+      "name": "Update Tickets",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n \r\n \"status\":\"CLOSED\"\r\n\r\n}\r\n",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/33/status",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "33",
+            "status"
+          ]
+        },
+        "description": "## Update Ticket Status\n\nUpdates the status of an existing support ticket by its ID.\n\n**Endpoint:** `PUT /api/tickets/{id}/status`\n\n**Base URL:** `http://localhost:8080`\n\n---\n\n### Authentication\n\nThis endpoint requires a valid JWT token. Include it in the `Authorization` header using the Bearer scheme:\n\n```\nAuthorization: Bearer {{token}}\n```\n\nThe `{{token}}` variable should be set in your active environment after a successful login.\n\n---\n\n### Path Parameters\n\n| Parameter | Type | Required | Description |\n|-----------|------|----------|-------------|\n| `id` | integer | Yes | The unique ID of the ticket to update. Example: `1` |\n\n---\n\n### Request Body\n\nSend a JSON object with the new status value:\n\n```json\n{\n  \"status\": \"CLOSED\"\n}\n```\n\n| Field | Type | Required | Description |\n|-------|------|----------|-------------|\n| `status` | string | Yes | The new status for the ticket. Accepted values: `OPEN`, `IN_PROGRESS`, `CLOSED` |\n\n---\n\n### Response\n\n**200 OK** — The ticket status was successfully updated. Returns the updated ticket object.\n\n**400 Bad Request** — The request body is invalid or the status value is not recognized.\n\n**401 Unauthorized** — The JWT token is missing, expired, or invalid.\n\n**404 Not Found** — No ticket exists with the given ID.\n\n---\n\n### Notes\n\n- Make sure you have a valid JWT token stored in the `{{token}}` environment variable. You can obtain one by sending the **Login** request.\n- The ticket ID in the URL path should correspond to an existing ticket. You can retrieve your tickets using the **Get My Tickets** request."
+      },
+      "response": []
+    },
+    {
+      "name": "Pagenation Test",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets?page=1&size=25",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1"
+            },
+            {
+              "key": "size",
+              "value": "25"
+            }
+          ]
+        },
+        "description": "## Pagination Test 1\n\nRetrieves the first page of support tickets with a page size of 2.\n\n**Endpoint:** `GET /api/tickets`\n\n**Base URL:** `http://localhost:8080`\n\n---\n\n### Authentication\n\nThis endpoint requires a valid JWT token passed as a Bearer token in the `Authorization` header.\n\n| Header | Value |\n| --- | --- |\n| `Authorization` | `Bearer {{token}}` |\n\n> The `{{token}}` variable should be set in your active environment. You can obtain a token by sending the **Login** request. \n  \n\n---\n\n### Query Parameters\n\n| Parameter | Type | Required | Description |\n| --- | --- | --- | --- |\n| `page` | integer | Yes | Zero-based page index. `0` returns the first page. |\n| `size` | integer | Yes | Number of tickets to return per page. Set to `2` in this request. |\n\n---\n\n### Example Request\n\n```\nGET http://localhost:8080/api/tickets?page=0&size=2\nAuthorization: Bearer {{token}}\n\n ```\n\n---\n\n### Response\n\n**Status:** `200 OK`\n\nReturns a paginated response object containing a `content` array of ticket objects along with pagination metadata.\n\n#### Response Body Structure\n\n| Field | Type | Description |\n| --- | --- | --- |\n| `content` | array | List of ticket objects for the current page. |\n| `content[].id` | integer | Unique identifier of the ticket. |\n| `content[].title` | string | Short title of the ticket. |\n| `content[].description` | string | Detailed description of the issue. |\n| `content[].createdAt` | string (ISO 8601) | Timestamp when the ticket was created. |\n| `content[].status` | string | Current status of the ticket (e.g., `OPEN`, `CLOSED`). |\n| `pageable` | object | Pagination details including `pageNumber`, `pageSize`, and `offset`. |\n| `totalElements` | integer | Total number of tickets across all pages. |\n| `totalPages` | integer | Total number of pages available. |\n| `first` | boolean | `true` if this is the first page. |\n| `last` | boolean | `true` if this is the last page. |\n| `size` | integer | Page size used for this response. |\n| `number` | integer | Current page number (zero-based). |\n| `numberOfElements` | integer | Number of elements on the current page. |\n| `empty` | boolean | `true` if the content array is empty. |\n\n#### Example Response\n\n``` json\n{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"title\": \"Login issue\",\n      \"description\": \"Cannot login to system\",\n      \"createdAt\": \"2026-04-06T14:24:43.917317\",\n      \"status\": \"OPEN\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Signup Isssue\",\n      \"description\": \"Cannot Signup to system\",\n      \"createdAt\": \"2026-04-06T14:25:31.883575\",\n      \"status\": \"OPEN\"\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 2,\n    \"offset\": 0,\n    \"paged\": true,\n    \"unpaged\": false\n  },\n  \"totalElements\": 4,\n  \"totalPages\": 2,\n  \"first\": true,\n  \"last\": false,\n  \"size\": 2,\n  \"number\": 0,\n  \"numberOfElements\": 2,\n  \"empty\": false\n}\n\n ```\n\n---\n\n### Notes\n\n- This request fetches **page 0** (the first page) with a page size of **2**.\n    \n- The response shows `totalElements: 4` and `totalPages: 2`, meaning there are 4 tickets split across 2 pages.\n    \n- To fetch the next page, increment the `page` parameter to `1` (see **Pagination Test 2**).\n    \n- All tickets returned in this example have a status of `OPEN`."
+      },
+      "response": []
+    },
+    {
+      "name": "Filter Test (Open Ticket Filter)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets?page=0&size=35&status=OPEN",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "35"
+            },
+            {
+              "key": "status",
+              "value": "OPEN"
+            }
+          ]
+        },
+        "description": "## Filter Tickets by Status (Paginated)\n\nFetches a paginated list of tickets filtered by their status. This endpoint is useful for retrieving only the tickets that match a specific status (e.g., `OPEN`, `CLOSED`), with support for pagination to control the number of results returned per page.\n\n---\n\n### HTTP Method & URL\n\n```\nGET http://localhost:8080/api/tickets\n\n ```\n\n---\n\n### Query Parameters\n\n| Parameter | Type | Required | Description | Example |\n| --- | --- | --- | --- | --- |\n| `page` | number | Yes | Zero-based page index. First page is `0`. | `0` |\n| `size` | number | Yes | Number of ticket items to return per page. | `5` |\n| `status` | string | Yes | Filter tickets by status. Accepted values: `OPEN`, `CLOSED`. | `OPEN` |\n\n---\n\n### Authentication\n\nThis endpoint requires a **Bearer Token** passed via the `Authorization` header.\n\n```\nAuthorization: Bearer {{token}}\n\n ```\n\nMake sure the `{{token}}` variable is set in your active environment before sending the request.\n\n---\n\n### Sample Response\n\n``` json\n{\n  \"content\": [\n    {\n      \"id\": 1,\n      \"title\": \"Login issue\",\n      \"description\": \"Cannot login to system\",\n      \"createdAt\": \"2026-04-06T14:24:43.917317\",\n      \"status\": \"OPEN\"\n    },\n    {\n      \"id\": 2,\n      \"title\": \"Signup Isssue\",\n      \"description\": \"Cannot Signup to system\",\n      \"createdAt\": \"2026-04-06T14:25:31.883575\",\n      \"status\": \"OPEN\"\n    }\n  ],\n  \"pageable\": {\n    \"pageNumber\": 0,\n    \"pageSize\": 5\n  },\n  \"totalElements\": 4,\n  \"totalPages\": 1,\n  \"first\": true,\n  \"last\": true,\n  \"numberOfElements\": 4,\n  \"empty\": false\n}\n\n ```\n\n---\n\n### Pagination Fields\n\n| Field | Description |\n| --- | --- |\n| `content` | Array of ticket objects matching the filter criteria for the current page. |\n| `pageable.pageNumber` | The current page number (zero-based). |\n| `pageable.pageSize` | The number of items requested per page. |\n| `totalElements` | Total number of tickets matching the filter across all pages. |\n| `totalPages` | Total number of pages available based on `size` and `totalElements`. |\n| `first` | `true` if this is the first page. |\n| `last` | `true` if this is the last page. |\n| `numberOfElements` | Actual number of elements returned in the current page's `content` array. |\n| `empty` | `true` if the `content` array is empty. |"
+      },
+      "response": []
+    },
+    {
+      "name": "Unauthorized  User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              ""
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"email\": \"exam@example.com\",\r\n  \"password\": \"password123\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/auth/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Missing Token (Close ticket 1)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/5/close",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "5",
+            "close"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Invalid Token (Filtering Ticeket)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets?page=0&size=5&status=OPEN",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "0"
+            },
+            {
+              "key": "size",
+              "value": "5"
+            },
+            {
+              "key": "status",
+              "value": "OPEN"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Ticket Not Found Error Handling",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/999/close",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "999",
+            "close"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Already Closed Error Handling",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets/4/close",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets",
+            "4",
+            "close"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Priority Feature Test3 (Invalid Priority)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Bug\",\r\n  \"description\": \"Something broke\",\r\n   \"priority\": \"Urgent\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Priority Feature Test4 (Lower Case Input)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Api Not connecting\",\r\n  \"description\": \"Invalid APi Token \",\r\n   \"priority\": \"high\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "http://localhost:8080/api/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Get my Ticket3 (Verifying Small Case and Invalid Priority Status IN Database)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "http://localhost:8080/api/tickets",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8080",
+          "path": [
+            "api",
+            "tickets"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
