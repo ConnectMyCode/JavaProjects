@@ -1,11 +1,13 @@
 package com.supporttriage.controller;
 
+import com.supporttriage.dto.AiTriageResponse; 
 import com.supporttriage.dto.CreateTicketRequest;
 import com.supporttriage.dto.RespondTicketRequest;
 import com.supporttriage.dto.TicketResponse;
 import com.supporttriage.dto.TriageSaveRequest;
 import com.supporttriage.dto.UpdateTicketStatusRequest;
 import com.supporttriage.entity.Ticket;
+import com.supporttriage.service.AiTriageService;
 import com.supporttriage.service.TicketService;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,9 +23,10 @@ import java.util.List;
 public class TicketController {
 
     private final TicketService ticketService;
-
-    public TicketController(TicketService ticketService) {
+    private final AiTriageService aiTriageService;
+    public TicketController(TicketService ticketService , AiTriageService aiTriageService) {
         this.ticketService = ticketService;
+        this.aiTriageService = aiTriageService;
     }
 
     /**
@@ -95,5 +98,12 @@ public class TicketController {
     
     
     
+    /*
+     Ai  Triage Run on Ticket 
+     * */
+    @PostMapping("/{id}/triage/run")
+    public AiTriageResponse runTriage(@PathVariable Long id) {
+    		return aiTriageService.runTriage(id);
+	   
+    }
 }
-
