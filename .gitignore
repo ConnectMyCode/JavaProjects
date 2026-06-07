@@ -28,3 +28,7 @@ logs/
 
 # Spring Boot specific
 spring-pid
+
+# Secrets
+src/main/resources/application.properties
+.env

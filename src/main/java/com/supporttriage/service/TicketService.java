@@ -365,9 +365,12 @@ public class TicketService {
         ticket.setCategory(request.getCategory());
         ticket.setSentiment(request.getSentiment());
         ticket.setTriagedAt(LocalDateTime.now());
-        
+        ticket.setPriority(request.getPriority()); 
+        ticket.setSummary(request.getSummary());
+        ticket.setReplyDraft(request.getReplyDraft());
         ticketRepository.save(ticket);
     }  	
         	
     	
+    
 }

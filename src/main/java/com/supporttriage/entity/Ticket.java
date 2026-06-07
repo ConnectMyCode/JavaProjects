@@ -48,8 +48,22 @@ public class Ticket {
  // Sentiment (AI will fill later)
    @Column(name="sentiment")
     private String sentiment;
-    
- //👉 Keep them as String (DO NOT create enums now — AI phase will decide structure)
+   
+   
+ // Sentiment (AI will fill later)
+   	@Column (name = "summary")
+   	private String summary;
+   	
+   	@Column(name = "reply_draft")
+   	private String replyDraft; 
+   	
+ 
+   
+ // Sentiment (AI will fill later)
+
+   
+   
+   //👉 Keep them as String (DO NOT create enums now — AI phase will decide structure)
     
     
     
@@ -203,6 +217,22 @@ public class Ticket {
 
 	public void setSentiment(String sentiment) {
 		this.sentiment = sentiment;
+	}
+				
+	public String getSummary() {
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public String getReplyDraft() {
+		return replyDraft;
+	}
+
+	public void setReplyDraft(String replyDraft) {
+		this.replyDraft = replyDraft;
 	}
 
 	public LocalDateTime getCreatedAt() {
