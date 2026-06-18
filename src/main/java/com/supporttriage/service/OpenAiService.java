@@ -11,6 +11,7 @@ import java.util.Map;
 /**
  * Handles OpenAI API communication safely
  */
+
 @Service
 public class OpenAiService {
 
@@ -41,8 +42,8 @@ public class OpenAiService {
 
         try {
 
-            String url = "https://api.openai.com/v1/chat/completions";
-
+            String url = "https://api.groq.com/openai/v1/chat/completions";
+            
             HttpHeaders headers = new HttpHeaders();
             headers.setBearerAuth(apiKey);
             headers.setContentType(MediaType.APPLICATION_JSON);
@@ -55,7 +56,8 @@ public class OpenAiService {
                                     "content", prompt
                             )
                     },
-                    "temperature", 0.2
+                    "temperature", 0.0,
+                    "max_tokens", 250
             );
 
             HttpEntity<Map<String, Object>> entity =

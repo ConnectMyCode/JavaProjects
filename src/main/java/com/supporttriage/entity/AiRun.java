@@ -43,7 +43,7 @@ public class AiRun {
 	 * Example: TRIAGE
 	 * */
 	@Column(nullable =false)
-	private String provider = "OPENAI"; 
+	private String provider = "GROQ"; 
 
 
 	/**

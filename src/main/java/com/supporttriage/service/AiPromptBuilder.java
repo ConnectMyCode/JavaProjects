@@ -21,59 +21,40 @@ public class AiPromptBuilder {
 	    /**
 	     * Build AI triage prompt from ticket
 	     */
-	    public String buildTriagePrompt(Ticket ticket) {
+	   
+private static final String SYSTEM_PROMPT = 
+ """
+You triage support tickets.
 
-	        return """
-	You are an AI support ticket triage assistant.
+Return ONLY valid JSON matching:
+{"category":"","priority":"","tags":[],"sentiment":"","summary":"","replyDraft":""}
 
-	Analyze the ticket title and description.
+Rules:
+- No markdown, explanations, or extra text
+- category ∈ [BILLING, TECHNICAL, ACCOUNT, FEATURE_REQUEST, GENERAL]
+- priority ∈ [LOW, MEDIUM, HIGH]
+- sentiment ∈ [NEGATIVE, NEUTRAL, POSITIVE]
+- tags: 1-5 items, lowercase, underscore_case, ≤30 chars each
+- summary: ≤300 chars
+- replyDraft: required, non-empty, ≤500 chars, professional customer reply
+  
+Title: %s
 
-	Return ONLY valid JSON.
-	Do NOT use markdown.
-	Do NOT include explanation.
-	Do NOT include extra text.
+Description: %s
+""";	
+        
+        public String buildTriagePrompt(Ticket ticket) {
+					
+	return SYSTEM_PROMPT.formatted(
+	        ticket.getTitle(),
+	        ticket.getDescription()); 
+	    
+	    
+        }
 
-	Allowed category values:
-	BILLING, TECHNICAL, ACCOUNT, FEATURE_REQUEST, GENERAL
 
-	Allowed priority values:
-	LOW, MEDIUM, HIGH
 
-	Allowed sentiment values:
-	NEGATIVE, NEUTRAL, POSITIVE
-
-	Tags:
-	- 1 to 5 tags
-	- lowercase only
-	- underscore format
-	- max 30 chars each
-
-	Summary:
-	- max 300 chars
-
-	ReplyDraft:
-	- max 500 chars
-
-	Ticket Title:
-	%s
-
-	Ticket Description:
-	%s
-
-	Output JSON:
-	{
-	  "category": "",
-	  "priority": "",
-	  "tags": [],
-	  "sentiment": "",
-	  "summary": "",
-	  "replyDraft": ""
-	}
-	""".formatted(
-	                ticket.getTitle(),
-	                ticket.getDescription()
-	        );
 	    }
-	}
+
 
 
