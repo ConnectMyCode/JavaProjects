@@ -50,14 +50,15 @@ public class Ticket {
     private String sentiment;
    
    
- // Sentiment (AI will fill later)
+ // AI generated summary...
    	@Column (name = "summary")
    	private String summary;
    	
+ // AI generated reply suggestion...	
    	@Column(name = "reply_draft")
    	private String replyDraft; 
    	
- 
+   	
    
  // Sentiment (AI will fill later)
 

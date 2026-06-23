@@ -19,7 +19,7 @@ public class AiRun {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	
 	
 	/**
      * Ticket linked to this AI run

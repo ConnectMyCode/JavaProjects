@@ -41,7 +41,7 @@ public class TicketService {
     public void createTicket(CreateTicketRequest request) { 
     	
         String email = SecurityUtil.getCurrentUserEmail();
-
+        	
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -367,8 +367,9 @@ public class TicketService {
         ticket.setTriagedAt(LocalDateTime.now());
         ticket.setPriority(request.getPriority()); 
         ticket.setSummary(request.getSummary());
-        ticket.setReplyDraft(request.getReplyDraft());
+        ticket.setReplyDraft(request.getReplyDraft()); 
         ticketRepository.save(ticket);
+        
     }  	
         	
     	
