@@ -18,7 +18,7 @@ public class LoginRequest {
 		this.password = password;
 	}
 
-    
+
 	/**
 	 * DTO for login request.
 	 *

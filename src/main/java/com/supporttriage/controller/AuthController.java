@@ -1,7 +1,10 @@
 package com.supporttriage.controller;
 
-import com.supporttriage.dto.*;
+import com.supporttriage.dto.*; 
 import com.supporttriage.service.AuthService;
+
+import jakarta.validation.Valid;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -15,7 +18,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public void signup(@RequestBody SignupRequest request) {
+    public void signup(@Valid  @RequestBody SignupRequest request) {
         authService.signup(request);
     }
 
@@ -24,6 +27,7 @@ public class AuthController {
         return authService.login(request);
     }
 }
+
 /**
  * REST controller for authentication APIs.
  *

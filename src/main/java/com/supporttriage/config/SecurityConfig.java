@@ -60,7 +60,7 @@ public class SecurityConfig {
  *
  * 3. Authorization rules:
  * - /api/auth/** → public (signup & login)
- * - All other endpoints → require authentication
+ * - All other endpoints → require authentication 
  * 
  * 4. JWT Filter:
  * - Added before UsernamePasswordAuthenticationFilter
