@@ -10,7 +10,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import org.springframework.http.MediaType;
 import com.supporttriage.dto.LoginRequest;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 
 
